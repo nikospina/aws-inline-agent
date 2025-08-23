@@ -1,0 +1,61 @@
+{
+  "vulnerabilities": {
+    "vulnerabilities": [
+      {
+        "description": "Vulnerability in the MySQL Connectors product of Oracle MySQL (component: Connector/J). Supported versions that are affected are 9.0.0-9.2.0. Difficult to exploit vulnerability allows low privileged attacker with network access via multiple protocols to compromise MySQL Connectors. Successful attacks of this vulnerability can result in takeover of MySQL Connectors. CVSS 3.1 Base Score 7.5 (Confidentiality, Integrity and Availability impacts). CVSS Vector: (CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:H/I:H/A:H).",
+        "severity": "high",
+        "affects": [
+          {
+            "path": "/app.jar/BOOT-INF/lib/mysql-connector-j-9.2.0.jar",
+            "installed_version": "pkg:maven/com.mysql/mysql-connector-j@9.2.0",
+            "fixed_version": "9.3.0"
+          }
+        ]
+      },
+      {
+        "description": "Connect2id Nimbus JOSE + JWT before 10.0.2 allows a remote attacker to cause a denial of service via a deeply nested JSON object supplied in a JWT claim set, because of uncontrolled recursion. NOTE: this is independent of the Gson 2.11.0 issue because the Connect2id product could have checked the JSON object nesting depth, regardless of what limits (if any) were imposed by Gson.",
+        "severity": "medium",
+        "affects": [
+          {
+            "path": "/app.jar/BOOT-INF/lib/nimbus-jose-jwt-9.37.3.jar",
+            "installed_version": "pkg:maven/com.nimbusds/nimbus-jose-jwt@9.37.3",
+            "fixed_version": "10.0.2"
+          }
+        ]
+      },
+      {
+        "description": "In some specific scenarios with chained redirects, Reactor Netty HTTP client leaks credentials. In order for this to happen, the HTTP client must have been explicitly configured to follow redirects.",
+        "severity": "medium",
+        "affects": [
+          {
+            "path": "/app.jar/BOOT-INF/lib/reactor-netty-http-1.2.7.jar",
+            "installed_version": "pkg:maven/io.projectreactor.netty/reactor-netty-http@1.2.7",
+            "fixed_version": "1.2.8"
+          }
+        ]
+      },
+      {
+        "description": "Uncontrolled Recursion vulnerability in Apache Commons Lang.\n\nThis issue affects Apache Commons Lang: Starting with commons-lang:commons-lang 2.0 to 2.6, and, from org.apache.commons:commons-lang3 3.0 before 3.18.0.\n\nThe methods ClassUtils.getClass(...) can throw StackOverflowError on very long inputs. Because an Error is usually not handled by applications and libraries, a StackOverflowError could cause an application to stop.\n\nUsers are recommended to upgrade to version 3.18.0, which fixes the issue.",
+        "severity": "medium",
+        "affects": [
+          {
+            "path": "/app.jar/BOOT-INF/lib/commons-lang3-3.17.0.jar",
+            "installed_version": "pkg:maven/org.apache.commons/commons-lang3@3.17.0",
+            "fixed_version": "3.18.0"
+          },
+          {
+            "path": "/app.jar/BOOT-INF/lib/commons-lang-2.6.jar",
+            "installed_version": "pkg:maven/commons-lang/commons-lang@2.6"
+          }
+        ]
+      }
+    ]
+  },
+  "vulnerability_count": {
+    "critical": 0,
+    "high": 1,
+    "medium": 3,
+    "low": 0,
+    "other": 0
+  }
+}
