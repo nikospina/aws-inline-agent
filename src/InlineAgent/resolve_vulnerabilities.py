@@ -17,17 +17,17 @@ print("Current Directory:", current_directory)
 print (current_directory)
 
 # Step 1: Define MCP stdio parameters
-server_params = StdioServerParameters(
-    command="docker",
-    args=["run", "-i", "--rm", "-v", "/workspace/aws-inline-agent:/local-directory", "mcp/filesystem", "/local-directory"],
-    timeout=300000,
-    env={"MCP_LOG_LEVEL": "DEBUG", "MCP_CONNECTION_TIMEOUT": "30", "MCP_REQUEST_TIMEOUT": "300"}
-)
-
 server_git_params = StdioServerParameters(
     command="python3.12",
     args=["-m", "mcp_server_git", "--repository", "/workspace/aws-inline-agent"],
 )
+
+#server_params = StdioServerParameters(
+#    command="docker",
+#    args=["run", "-i", "--rm", "-v", "/workspace/aws-inline-agent:/local-directory", "mcp/filesystem", "/local-directory"],
+#    timeout=300000,
+#    env={"MCP_LOG_LEVEL": "DEBUG", "MCP_CONNECTION_TIMEOUT": "30", "MCP_REQUEST_TIMEOUT": "300"}
+#)
 
 #server_git_params = StdioServerParameters(
 #    command="docker",
@@ -40,15 +40,21 @@ server_git_params = StdioServerParameters(
 async def invoke_agent(modelId):
 
     #time_mcp_client = await MCPStdio.create(server_params=server_params)
-    filesystem_mcp_client = await MCPStdio.create(server_params=server_params)
     git_mcp_client = await MCPStdio.create(server_params=server_git_params)
+    #filesystem_mcp_client = await MCPStdio.create(server_params=server_params)
 
     try:
         # Step 3: Define an action group
-        filesystem_action_group = ActionGroup(
-            name="filesystemActionGroup",
+        #filesystem_action_group = ActionGroup(
+        #    name="filesystemActionGroup",
+        #    description="Helps user to get iteraction with local files.",
+        #    mcp_clients=[git_mcp_client],
+        #)
+
+        git_action_group = ActionGroup(
+            name="gitActionGroup",
             description="Helps user to get iteraction with local files.",
-            mcp_clients=[filesystem_mcp_client, git_mcp_client],
+            mcp_clients=[git_mcp_client],
         )
 
         # Step 4: Invoke agent
@@ -59,7 +65,7 @@ async def invoke_agent(modelId):
             instruction="""You are a friendly code secure assistant that is responsible for resolving user queries.""",
             # Step 4.3: Provide the agent name and action group
             agent_name="remediate_vulnerabilities_agent",
-            action_groups=[filesystem_action_group],
+            action_groups=[git_action_group],
         ).invoke(
             input_text="""
             Realiza las siguientes tareas:
