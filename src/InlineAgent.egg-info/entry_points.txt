@@ -1,0 +1,2 @@
+[console_scripts]
+InlineAgent_hello = InlineAgent.resolve_vulnerabilities:main

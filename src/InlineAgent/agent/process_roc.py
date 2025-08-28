@@ -12,7 +12,7 @@ class ProcessROC:
     async def process_roc(
         inlineSessionState: Dict, roc_event: Dict, tool_map: Dict[str, Callable]
     ):
-        # TODO: Tool to invoke is str and callable
+        # Validaciones iniciales
         if "returnControlInvocationResults" in inlineSessionState:
             raise ValueError(
                 "returnControlInvocationResults key is not supported in sessionState"
@@ -26,10 +26,7 @@ class ProcessROC:
         inlineSessionState["invocationId"] = roc_event["invocationId"]
 
         for invocationInput in roc_event["invocationInputs"]:
-
-            # This is a Tagged Union structure. Only one of the following top level keys will be set: apiInvocationInput, functionInvocationInput.
-            # If a client receives an unknown member it will set SDK_UNKNOWN_MEMBER as the top level key, which maps to the name or tag of the unknown member.
-            # The structure of SDK_UNKNOWN_MEMBER is as follows: 'SDK_UNKNOWN_MEMBER': {'name': 'UnknownMemberName'}
+            # Estructura Tagged Union
             if "apiInvocationInput" in invocationInput:
                 raise ValueError(
                     "apiInvocationInput is not supported in returnControlInvocationResults"
@@ -41,35 +38,45 @@ class ProcessROC:
             functionInvocationInput = invocationInput["functionInvocationInput"]
             actionGroup = functionInvocationInput["actionGroup"]
 
+            # ✅ Procesamos parámetros con manejo robusto de arrays no JSON
             parameters = dict()
             for param in functionInvocationInput["parameters"]:
                 if param["type"] == "array":
-                    result = None
                     try:
+                        # Intentamos parsear como JSON válido
                         result = json.loads(param["value"])
-                    except Exception:
-                        json_str = (
-                            param["value"]
-                            .replace("=", ":")
-                            .replace("[{", '[{"')
-                            .replace("}]", '"}]')
-                        )
-                        json_str = json_str.replace(", ", '", "').replace(":", '":"')
-                        result = json.loads(json_str)
-                    finally:
-                        parameters[param["name"]] = result
+                    except json.JSONDecodeError:
+                        # Si no es JSON válido, lo convertimos manualmente
+                        clean_value = param["value"].strip("[] ")
+                        if clean_value:
+                            result = [
+                                item.strip().strip('"').strip("'")
+                                for item in clean_value.split(",")
+                            ]
+                        else:
+                            result = []
+                    parameters[param["name"]] = result
+
                 elif param["type"] == "string":
                     parameters[param["name"]] = param["value"]
-                elif param["type"] == "number":
-                    parameters[param["name"]] = int(param["value"])
+
+                elif param["type"] in ["number", "integer"]:
+                    try:
+                        parameters[param["name"]] = int(param["value"])
+                    except ValueError:
+                        raise ValueError(
+                            f"Invalid integer value for {param['name']}: {param['value']}"
+                        )
+
                 elif param["type"] == "boolean":
-                    parameters[param["name"]] = bool(param["value"])
-                elif param["type"] == "integer":
-                    parameters[param["name"]] = int(param["value"])
-            if (
-                actionInvocationType == "RESULT"
-                or actionInvocationType == "USER_CONFIRMATION_AND_RESULT"
-            ):
+                    parameters[param["name"]] = str(param["value"]).lower() in [
+                        "true",
+                        "1",
+                        "yes",
+                    ]
+
+            # ✅ Invocación de herramientas según tipo de acción
+            if actionInvocationType in ["RESULT", "USER_CONFIRMATION_AND_RESULT"]:
                 tool_to_invoke: Callable = None
                 if functionInvocationInput["function"] in tool_map:
                     tool_to_invoke = tool_map[functionInvocationInput["function"]]
@@ -87,7 +94,6 @@ class ProcessROC:
                         include_result=True,
                         parameters=parameters,
                     )
-
                 else:
                     inlineSessionState["returnControlInvocationResults"].append(
                         {
@@ -123,10 +129,9 @@ class ProcessROC:
         tool_to_invoke: Union[str, Callable] = None,
     ):
         while True:
-            if isinstance(tool_to_invoke, Callable):
-                tool_name = tool_to_invoke.__name__
-            else:
-                tool_name = tool_to_invoke
+            tool_name = (
+                tool_to_invoke.__name__ if isinstance(tool_to_invoke, Callable) else tool_to_invoke
+            )
             confirmation_message = f"Do you want to proceed with {tool_name} with parameters : {json.dumps(parameters)}?"
             response = input(f"{confirmation_message} (y/n): ").lower()
             if response in ["y", "yes"]:
@@ -167,7 +172,6 @@ class ProcessROC:
                                     }
                                 },
                                 "confirmationState": "DENY",
-                                # "responseState": "FAILURE"
                             }
                         }
                     )
@@ -179,7 +183,6 @@ class ProcessROC:
                                 "agentId": functionInvocationInput["agentId"],
                                 "function": functionInvocationInput["function"],
                                 "confirmationState": "DENY",
-                                # "responseState": "FAILURE"
                             }
                         }
                     )
@@ -194,12 +197,9 @@ class ProcessROC:
         confirm: str = None,
         tool_to_invoke: Callable = None,
     ) -> Dict:
-
         functionResult = dict
 
-        # TODO: responseState
         try:
-
             if inspect.iscoroutinefunction(tool_to_invoke):
                 result = await tool_to_invoke(**parameters)
             else:
@@ -223,7 +223,7 @@ class ProcessROC:
                 "actionGroup": functionInvocationInput["actionGroup"],
                 "agentId": functionInvocationInput["agentId"],
                 "function": functionInvocationInput["function"],
-                "responseBody": {"TEXT": {"body": e}},
+                "responseBody": {"TEXT": {"body": str(e)}},
                 "responseState": "FAILURE",
             }
 
@@ -232,6 +232,6 @@ class ProcessROC:
                 functionResult["confirmationState"] = confirm
                 return functionResult
             else:
-                raise ValueError("Only CONFIRM is a value value")
+                raise ValueError("Only CONFIRM is a valid value")
         else:
             return functionResult

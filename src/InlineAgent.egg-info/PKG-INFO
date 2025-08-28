@@ -1,0 +1,27 @@
+Metadata-Version: 2.4
+Name: InlineAgent
+Version: 0+untagged.2.g5378c83.dirty
+Summary: Lightweight SDK for Amazon Bedrock Inline Agents
+Author-email: Eashan Kaushik <eashank@amazon.com>
+License: MIT
+Project-URL: Repository, https://github.com/awslabs/amazon-bedrock-agent-samples
+Keywords: bedrock,inline,agents,SDK
+Classifier: License :: Apache License 2.0
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: boto3==1.37.21
+Requires-Dist: pydantic==2.10.2
+Requires-Dist: termcolor==2.5.0
+Requires-Dist: rich==13.9.4
+Requires-Dist: opentelemetry-api==1.31.1
+Requires-Dist: opentelemetry-sdk==1.31.1
+Requires-Dist: opentelemetry-exporter-otlp==1.31.1
+Requires-Dist: openinference-semantic-conventions==0.1.16
+Requires-Dist: pydantic-settings==2.8.1
+Requires-Dist: wrapt==1.17.2
+Requires-Dist: botocore==1.37.23
+Requires-Dist: mcp==1.6.0
+
+# aws-inline-agent
