@@ -19,19 +19,19 @@ print (current_directory)
 # Step 1: Define MCP stdio parameters
 server_git_params = StdioServerParameters(
     command="python3.12",
-    args=["-m", "mcp_server_git", "--repository", "/workspace/aws-inline-agent"],
+    args=["-m", "mcp_server_git", "-r", "/workspace/aws-inline-agent"],
 )
 
-#server_params = StdioServerParameters(
-#    command="docker",
-#    args=["run", "-i", "--rm", "-v", "/workspace/aws-inline-agent:/local-directory", "mcp/filesystem", "/local-directory"],
-#    timeout=300000,
-#    env={"MCP_LOG_LEVEL": "DEBUG", "MCP_CONNECTION_TIMEOUT": "30", "MCP_REQUEST_TIMEOUT": "300"}
-#)
+server_params = StdioServerParameters(
+    command="docker",
+    args=["run", "-i", "--rm", "-v", "/workspace/aws-inline-agent:/workspace/aws-inline-agent", "mcp/filesystem", "/workspace/aws-inline-agent"],
+    timeout=300000,
+    env={"MCP_LOG_LEVEL": "DEBUG", "MCP_CONNECTION_TIMEOUT": "30", "MCP_REQUEST_TIMEOUT": "300"}
+)
 
 #server_git_params = StdioServerParameters(
 #    command="docker",
-#    args=["run", "-i", "--rm", "-v", "/workspace:/workspace" , "mcp/git"],
+#    args=["run", "-i", "--rm", "-v", "/workspace/aws-inline-agent:/local-directory", "mcp/git"],
 #    timeout=300000,
 #    env={"MCP_LOG_LEVEL": "DEBUG", "MCP_CONNECTION_TIMEOUT": "30", "MCP_REQUEST_TIMEOUT": "300"}
 #)
@@ -41,15 +41,15 @@ async def invoke_agent(modelId):
 
     #time_mcp_client = await MCPStdio.create(server_params=server_params)
     git_mcp_client = await MCPStdio.create(server_params=server_git_params)
-    #filesystem_mcp_client = await MCPStdio.create(server_params=server_params)
+    filesystem_mcp_client = await MCPStdio.create(server_params=server_params)
 
     try:
         # Step 3: Define an action group
-        #filesystem_action_group = ActionGroup(
-        #    name="filesystemActionGroup",
-        #    description="Helps user to get iteraction with local files.",
-        #    mcp_clients=[git_mcp_client],
-        #)
+        filesystem_action_group = ActionGroup(
+            name="filesystemActionGroup",
+            description="Helps user to get iteraction with local files.",
+            mcp_clients=[filesystem_mcp_client],
+        )
 
         git_action_group = ActionGroup(
             name="gitActionGroup",
@@ -65,7 +65,7 @@ async def invoke_agent(modelId):
             instruction="""You are a friendly code secure assistant that is responsible for resolving user queries.""",
             # Step 4.3: Provide the agent name and action group
             agent_name="remediate_vulnerabilities_agent",
-            action_groups=[git_action_group],
+            action_groups=[filesystem_action_group, git_action_group],
         ).invoke(
             input_text="""
             Realiza las siguientes tareas:
@@ -80,13 +80,13 @@ async def invoke_agent(modelId):
             8. La ruta del pom generado es ./output.
             9. Debes generar un archivo en formato .md de documentación en donde se explique cuales fueron las vulnerabilidades solucionadas y cuales no, debes dar un contexto de la vulnerabilidad y su criticiadad.
             10. Realiza commit de los ajustes realizados en en repositorio.
-            11. Realiza el push al repositorio remoto."""
+            11. Asegurate de realizar el push al repositorio remoto."""
         )
 
     finally:
 
         await filesystem_mcp_client.cleanup()
-
+        await git_mcp_client.cleanup()
 
 def main():
     parser = argparse.ArgumentParser()
