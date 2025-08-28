@@ -61,13 +61,15 @@ async def invoke_agent(modelId):
             ------- SOLUCIÓN DE VULNERABILIDADES -------
             1. analiza los archivos del folder vulnerabilitiesFiles.
             2. Utiliza el pom.xml como referencia para corregir las vulnerabilidades reportadas en el reporte de inspector.
-            3. Crear un nuevo archivo pom1.xml COMPLETO con todas las dependencias, configuraciones y ajustes realizados que sea compilable.
+            3. Crear un nuevo archivo pom2.xml COMPLETO con todas las dependencias, configuraciones y ajustes realizados que sea compilable.
             4. No borre o excluya por completo alguna dependencia ya que el proyecto perderia su consistencia.
             5. En caso de que la ultima version disponible de alguna dependencia sea vulnerable, debe mantenerla.
             6. Tenga en cuenta que el proyecto conserve su compatibilidad con su respectiva version de java y spring boot.
-            7. Tenga en cuenta que en la sección de dependency management deben quedar las dependencias ajustadas, ya que esta configuración asegura que no se traigan mas versiones como transitivas".
-            8. La ruta del pom generado es ./output
+            7. Tenga en cuenta que en la sección de dependency management deben quedar las dependencias ajustadas, ya que esta configuración asegura que no se traigan mas versiones como transitivas.
+            8. La ruta del pom generado es ./output.
             9. Debes generar un archivo en formato .md de documentación en donde se explique cuales fueron las vulnerabilidades solucionadas y cuales no, debes dar un contexto de la vulnerabilidad y su criticiadad.
+            10. Realiza commit de los ajustes realizados en en repositorio.
+            11. Realiza el push al repositorio remoto."""
         )
 
     finally:
