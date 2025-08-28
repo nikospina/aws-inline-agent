@@ -25,11 +25,16 @@ server_params = StdioServerParameters(
 )
 
 server_git_params = StdioServerParameters(
-    command="docker",
-    args=["run", "--rm", "-i", "-v", "/workspace/aws-inline-agent:/workspace/aws-inline-agent", "mcp/git"],
-    timeout=300000,
-    env={"MCP_LOG_LEVEL": "DEBUG", "MCP_CONNECTION_TIMEOUT": "30", "MCP_REQUEST_TIMEOUT": "300"}
+    command="python3.12",
+    args=["-m", "mcp_server_git", "--repository", "/workspace/aws-inline-agent"],
 )
+
+#server_git_params = StdioServerParameters(
+#    command="docker",
+#    args=["run", "-i", "--rm", "-v", "/workspace:/workspace" , "mcp/git"],
+#    timeout=300000,
+#    env={"MCP_LOG_LEVEL": "DEBUG", "MCP_CONNECTION_TIMEOUT": "30", "MCP_REQUEST_TIMEOUT": "300"}
+#)
 
 
 async def invoke_agent(modelId):

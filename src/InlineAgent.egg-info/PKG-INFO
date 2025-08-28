@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: InlineAgent
-Version: 0+untagged.5.g77c7920.dirty
+Version: 0+untagged.15.gae74703.dirty
 Summary: Lightweight SDK for Amazon Bedrock Inline Agents
 Author-email: Eashan Kaushik <eashank@amazon.com>
 License: MIT
