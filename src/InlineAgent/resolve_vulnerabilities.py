@@ -13,7 +13,6 @@ import os
 
 current_directory = os.getcwd()
 print("Current Directory:", current_directory)
-# r"C:\Users\nospina\Documents\cobiscorp\docker\python\src\InlineAgent:/local-directory"
 
 print (current_directory)
 
@@ -49,8 +48,18 @@ async def invoke_agent(modelId):
             agent_name="remediate_vulnerabilities_agent",
             action_groups=[filesystem_action_group],
         ).invoke(
-            input_text="Realiza las siguientes tareas: 1. analiza los archivos del folder vulnerabilitiesFiles. 2. Utiliza el pom.xml de referencia para corregir las vulnerabilidades reportadas en el reporte de inspector inspector_scan.json. 4. utiliza la herramienta mcp filesystem para crear un nuevo archivo pom1.xml COMPLETO con todas las dependencias, configuraciones y ajustes realizados que sea compilable. 6. No borre por completo alguna dependencia ya que el proyecto perderia su consistencia. 7. Tenga en cuenta que el proyecto conserve su compatibilidad con su respectiva version de java y spring boot. 8. Tenga en cuenta que en la sección de dependency management deben quedar las dependencias ajustadas, ya que esta configuración asegura que no se traigan mas versiones como transitivas"
-            #Ten en cuenta las vulnerabilidades reportadas en el reporte de inspector inspector_scan.json y el arbol de dependencias dependenciesTree.txt en la carpeta vulnerabilitiesFiles, para resolver las vulnerabilidades reportadas tomando como base el pom.xml, debes retornar un archivo pom.xml nuevo con el ajuste y la respectiva documentación en formato md.
+            input_text="""
+            Realiza las siguientes tareas:
+            ------- SOLUCIÓN DE VULNERABILIDADES -------
+            1. analiza los archivos del folder vulnerabilitiesFiles.
+            2. Utiliza el pom.xml como referencia para corregir las vulnerabilidades reportadas en el reporte de inspector.
+            3. Crear un nuevo archivo pom1.xml COMPLETO con todas las dependencias, configuraciones y ajustes realizados que sea compilable.
+            4. No borre o excluya por completo alguna dependencia ya que el proyecto perderia su consistencia.
+            5. En caso de que la ultima version disponible de alguna dependencia sea vulnerable, debe mantenerla.
+            6. Tenga en cuenta que el proyecto conserve su compatibilidad con su respectiva version de java y spring boot.
+            7. Tenga en cuenta que en la sección de dependency management deben quedar las dependencias ajustadas, ya que esta configuración asegura que no se traigan mas versiones como transitivas".
+            8. La ruta del pom generado es ./output
+            9. Debes generar un archivo en formato .md de documentación en donde se explique cuales fueron las vulnerabilidades solucionadas y cuales no, debes dar un contexto de la vulnerabilidad y su criticiadad.
         )
 
     finally:
@@ -78,3 +87,4 @@ InlineAgent(
     console = Console()
     console.print(Markdown(f"**Running Hello world agent:**\n```python{code}```"))
     asyncio.run(invoke_agent(modelId=args.modelId))
+
