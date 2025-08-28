@@ -25,10 +25,10 @@ server_params = StdioServerParameters(
 )
 
 server_git_params = StdioServerParameters(
-    command="npx",
-    args=["@cyanheads/git-mcp-server"],
+    command="docker",
+    args=["run", "--rm", "-i", "-v", "/workspace/aws-inline-agent:/workspace/aws-inline-agent", "mcp/git"],
     timeout=300000,
-    env={"MCP_LOG_LEVEL": "DEBUG", "MCP_CONNECTION_TIMEOUT": "30", "MCP_REQUEST_TIMEOUT": "300", "GIT_SIGN_COMMITS": "false", "MCP_AUTH_MODE": "jwt", "MCP_AUTH_SECRET_KEY": "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"}
+    env={"MCP_LOG_LEVEL": "DEBUG", "MCP_CONNECTION_TIMEOUT": "30", "MCP_REQUEST_TIMEOUT": "300"}
 )
 
 
