@@ -38,19 +38,19 @@
         <cobis-xsell-ftd.integration.version>2.0.1</cobis-xsell-ftd.integration.version>
         <core.version>1.0.2</core.version>
 
-        <!-- Dependency versions - UPDATED FOR SECURITY FIXES -->
+        <!-- Dependency versions - ACTUALIZADAS PARA CORREGIR VULNERABILIDADES -->
         <aws-java-sdk-xray.version>2.18.2</aws-java-sdk-xray.version>
         <aws-java-sdk.v1.version>1.12.779</aws-java-sdk.v1.version>
         <aws-java-sdk.version>2.27.14</aws-java-sdk.version>
         <test-containers.version>1.20.4</test-containers.version>
-        <commons-lang.version>2.6</commons-lang.version>
+        <!-- commons-lang 2.6 actualizado a 3.18.0 (migrar de commons-lang a commons-lang3) -->
+        <commons-lang3.version>3.18.0</commons-lang3.version>
         <aws-secretsmanager-jdbc.version>1.0.9</aws-secretsmanager-jdbc.version>
         <jackson-dataformat-xml.version>2.11.1</jackson-dataformat-xml.version>
-        <!-- Fixed vulnerability versions -->
+        <!-- Versiones actualizadas para vulnerabilidades -->
         <mysql-connector-j.version>9.3.0</mysql-connector-j.version>
         <nimbus-jose-jwt.version>10.0.2</nimbus-jose-jwt.version>
         <reactor-netty.version>1.2.8</reactor-netty.version>
-        <commons-lang3.version>3.18.0</commons-lang3.version>
     </properties>
     <description>Business Process Microservice</description>
     <dependencies>
@@ -188,7 +188,7 @@
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>${mysql-connector-j.version}</version>
+            <!-- Versión controlada por dependencyManagement -->
         </dependency>
         <dependency>
             <groupId>com.amazonaws.secretsmanager</groupId>
@@ -262,11 +262,11 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Other dependencies -->
+        <!-- Other dependencies - MIGRACIÓN DE COMMONS-LANG A COMMONS-LANG3 -->
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>${commons-lang.version}</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <!-- Versión controlada por dependencyManagement -->
         </dependency>
         <dependency>
             <groupId>jakarta.servlet</groupId>
@@ -329,20 +329,24 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!-- SECURITY FIXES - Force specific versions to avoid vulnerabilities -->
-            <!-- MySQL Connector J - Fix CVE High severity -->
+            
+            <!-- CORRECCIONES DE VULNERABILIDADES EN DEPENDENCY MANAGEMENT -->
+            
+            <!-- 1. MySQL Connector J - Actualizado de 9.2.0 a 9.3.0 -->
             <dependency>
                 <groupId>com.mysql</groupId>
                 <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql-connector-j.version}</version>
             </dependency>
-            <!-- Nimbus JOSE JWT - Fix CVE Medium severity -->
+            
+            <!-- 2. Nimbus JOSE JWT - Actualizado de 9.37.3 a 10.0.2 -->
             <dependency>
                 <groupId>com.nimbusds</groupId>
                 <artifactId>nimbus-jose-jwt</artifactId>
                 <version>${nimbus-jose-jwt.version}</version>
             </dependency>
-            <!-- Reactor Netty HTTP - Fix CVE Medium severity -->
+            
+            <!-- 3. Reactor Netty HTTP - Actualizado de 1.2.7 a 1.2.8 -->
             <dependency>
                 <groupId>io.projectreactor.netty</groupId>
                 <artifactId>reactor-netty-http</artifactId>
@@ -353,13 +357,23 @@
                 <artifactId>reactor-netty-core</artifactId>
                 <version>${reactor-netty.version}</version>
             </dependency>
-            <!-- Apache Commons Lang3 - Fix CVE Medium severity -->
+            
+            <!-- 4. Commons Lang3 - Actualizado de 3.17.0 a 3.18.0 -->
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
             </dependency>
-            <!-- To avoid vulnerabilities - Keep existing fixes -->
+            
+            <!-- Excluir commons-lang 2.6 completamente y usar solo commons-lang3 -->
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>[0,)</version>
+                <scope>provided</scope>
+            </dependency>
+            
+            <!-- To avoid other vulnerabilities - Mantenidas del pom original -->
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
@@ -469,6 +483,11 @@
                         <exclude>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
+                        </exclude>
+                        <!-- Excluir commons-lang 2.6 del jar final -->
+                        <exclude>
+                            <groupId>commons-lang</groupId>
+                            <artifactId>commons-lang</artifactId>
                         </exclude>
                     </excludes>
                 </configuration>
