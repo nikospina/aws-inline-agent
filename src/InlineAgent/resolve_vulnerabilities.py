@@ -24,18 +24,26 @@ server_params = StdioServerParameters(
     env={"MCP_LOG_LEVEL": "DEBUG", "MCP_CONNECTION_TIMEOUT": "30", "MCP_REQUEST_TIMEOUT": "300"}
 )
 
+server_git_params = StdioServerParameters(
+    command="npx",
+    args=["@cyanheads/git-mcp-server"],
+    timeout=300000,
+    env={"MCP_LOG_LEVEL": "DEBUG", "MCP_CONNECTION_TIMEOUT": "30", "MCP_REQUEST_TIMEOUT": "300", "GIT_SIGN_COMMITS": "false", "MCP_AUTH_MODE": "jwt", "MCP_AUTH_SECRET_KEY": "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"}
+)
+
 
 async def invoke_agent(modelId):
 
     #time_mcp_client = await MCPStdio.create(server_params=server_params)
     filesystem_mcp_client = await MCPStdio.create(server_params=server_params)
+    git_mcp_client = await MCPStdio.create(server_params=server_git_params)
 
     try:
         # Step 3: Define an action group
         filesystem_action_group = ActionGroup(
             name="filesystemActionGroup",
             description="Helps user to get iteraction with local files.",
-            mcp_clients=[filesystem_mcp_client],
+            mcp_clients=[filesystem_mcp_client, git_mcp_client],
         )
 
         # Step 4: Invoke agent
@@ -87,4 +95,5 @@ InlineAgent(
     console = Console()
     console.print(Markdown(f"**Running Hello world agent:**\n```python{code}```"))
     asyncio.run(invoke_agent(modelId=args.modelId))
+
 
